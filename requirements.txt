@@ -1,0 +1,10 @@
+Flask==3.0.3
+gunicorn==22.0.0
+numpy
+opencv-python
+face-recognition
+deepface
+tensorflow
+tf-keras
+Pillow
+sqlite-utils
