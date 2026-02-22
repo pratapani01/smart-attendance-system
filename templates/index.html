@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Attendance System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white" style="min-height:100vh;">
+    {% include "navbar.html" %}
+
+
+<div class="container text-center mt-5">
+
+    <h1 class="mb-4">Smart Campus Attendance System</h1>
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-3 mb-3">
+            <a href="/teacher" class="btn btn-primary btn-lg w-100">Teacher Login</a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a href="/admin" class="btn btn-success btn-lg w-100">Admin Login</a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a href="/scan" class="btn btn-warning btn-lg w-100">Student Face Scan</a>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <a href="/qr" class="btn btn-danger btn-lg w-100">Gate QR Scan</a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

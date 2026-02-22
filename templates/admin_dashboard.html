@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white">
+
+{% include "navbar.html" %}
+
+<div class="container mt-5">
+
+    <h2>Admin Control Panel</h2>
+
+    <div class="row mt-4">
+
+        <div class="col-md-4 mb-3">
+            <a href="/students" class="btn btn-primary w-100 p-3">
+                Students List
+            </a>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <a href="/register" class="btn btn-success w-100 p-3">
+                Add New Student
+            </a>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <a href="/admin_attendance" class="btn btn-warning w-100 p-3">
+                Attendance Table
+            </a>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <a href="/subjects" class="btn btn-info w-100 p-3">
+                Class Reports
+            </a>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <a href="/entry_logs" class="btn btn-secondary w-100 p-3">
+                Gate Entry Logs
+            </a>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <a href="/export_excel" class="btn btn-danger w-100 p-3">
+                Export Excel
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
