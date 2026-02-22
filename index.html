@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+
+```
+<!-- Instant redirect (primary method) -->
+<meta http-equiv="refresh" content="0; url=templates/index.html">
+
+<!-- JS redirect (backup method) -->
+<script>
+    window.location.replace("templates/index.html");
+</script>
+
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        background:#f4f6f8;
+        margin:0;
+    }
+    .box{
+        text-align:center;
+        padding:30px;
+        background:white;
+        border-radius:10px;
+        box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+    a{
+        color:#007bff;
+        text-decoration:none;
+        font-weight:bold;
+    }
+</style>
+```
+
+</head>
+
+<body>
+    <div class="box">
+        <h2>Redirecting to website...</h2>
+        <p>If it doesn't redirect automatically,</p>
+        <p><a href="templates/index.html">Click here</a></p>
+    </div>
+</body>
+</html>
