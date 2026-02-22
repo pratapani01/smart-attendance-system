@@ -1,5 +1,5 @@
 import sqlite3
-
+from datetime import datetime
 DB_NAME = "attendance.db"
 
 def init_db():
@@ -39,6 +39,15 @@ def init_db():
         exit_time TEXT
     )
     """)
+    c.execute("""
+CREATE TABLE IF NOT EXISTS gate_logs(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    roll TEXT,
+    status TEXT,
+    time TEXT
+)
+""")
 
     conn.commit()
     conn.close()
@@ -115,30 +124,34 @@ def get_subject_attendance(subject):
 # ---------- GATE FUNCTIONS ----------
 
 def mark_entry_exit(name, roll):
-    conn = sqlite3.connect(DB_NAME)
+
+    conn = sqlite3.connect("attendance.db")
     c = conn.cursor()
 
+    # last status check
     c.execute("""
-    SELECT id FROM entry_logs 
-    WHERE roll=? AND exit_time IS NULL
-    """, (roll,))
-    row = c.fetchone()
+    SELECT status FROM gate_logs
+    WHERE roll=?
+    ORDER BY id DESC LIMIT 1
+    """,(roll,))
+    last=c.fetchone()
 
-    now = sqlite3.datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    if row:
-        c.execute("UPDATE entry_logs SET exit_time=? WHERE id=?", (now, row[0]))
-        conn.commit()
-        conn.close()
-        return "Exit Marked"
+    if last and last[0]=="ENTRY":
+        status="EXIT"
     else:
-        c.execute("""
-        INSERT INTO entry_logs (name, roll, entry_time, exit_time)
-        VALUES (?,?,?,NULL)
-        """, (name, roll, now))
-        conn.commit()
-        conn.close()
-        return "Entry Marked"
+        status="ENTRY"
+
+    time=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    c.execute("""
+    INSERT INTO gate_logs(name, roll, status, time)
+    VALUES(?,?,?,?)
+    """,(name,roll,status,time))
+
+    conn.commit()
+    conn.close()
+
+    return f"{name} {status} marked"
 
 def get_entry_logs():
     conn = sqlite3.connect(DB_NAME)
@@ -147,3 +160,11 @@ def get_entry_logs():
     rows = c.fetchall()
     conn.close()
     return rows
+
+def get_gate_logs():
+    conn = sqlite3.connect("attendance.db")
+    c = conn.cursor()
+    c.execute("SELECT name, roll, status, time FROM gate_logs ORDER BY time DESC")
+    data = c.fetchall()
+    conn.close()
+    return data

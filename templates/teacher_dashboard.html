@@ -2,80 +2,139 @@
 <html>
 <head>
     <title>Teacher Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-dark text-white" style="min-height:100vh;">
-    {% include "navbar.html" %}
+    <style>
+        body{
+            background: linear-gradient(135deg,#1c1c1c,#232526,#414345);
+            color:white;
+            min-height:100vh;
+        }
+        .card-box{
+            background:rgba(255,255,255,.08);
+            border-radius:12px;
+            padding:30px;
+            backdrop-filter: blur(8px);
+        }
+        .link-box{
+            background:#111;
+            padding:10px;
+            border-radius:6px;
+            word-break:break-all;
+        }
+        .timer{
+            font-size:28px;
+            font-weight:bold;
+        }
+        @media(max-width:768px){
 
+    .container{
+        padding:15px!important;
+    }
+
+    h1,h2,h3{
+        font-size:22px!important;
+    }
+
+    .card-box{
+        padding:18px!important;
+    }
+
+    video{
+        width:100%!important;
+        height:auto!important;
+    }
+
+    table{
+        font-size:14px;
+    }
+
+    .btn{
+        width:100%;
+        margin-top:8px;
+    }
+
+}
+    </style>
+</head>
+
+<body>
 
 <div class="container mt-5">
 
-    <h2>Welcome Teacher</h2>
-    <p>Subject: <b>{{ subject }}</b></p>
+    <h2>Teacher Dashboard</h2>
+    <p class="text-muted">Subject: <b>{{ subject }}</b></p>
 
-    <div class="card bg-secondary p-4 mt-4">
-        <h4>Attendance Session</h4>
+    <div class="card-box mt-4">
 
-        {% if session_active %}
-            <p class="text-success">Session is ACTIVE</p>
+        {% if not session_active %}
 
-            <p>Time Remaining: <b id="timer">{{ time_left }}</b></p>
-
-            <p>Scan Link:</p>
-            <div class="bg-dark p-2 text-break">
-                {{ scan_link }}
-            </div>
-
-            <button class="btn btn-secondary mt-2" disabled>
-                Session Running
-            </button>
-
-        {% else %}
-            <p class="text-warning">Session is OFF</p>
+            <h4>Start Attendance Session</h4>
 
             <form method="POST">
-                <button type="submit" class="btn btn-success">
-                    Start Attendance Session
+                <input type="hidden" name="action" value="start">
+                <button class="btn btn-success btn-lg">
+                    Start Session
                 </button>
             </form>
+
+        {% else %}
+
+            <h4 class="text-success">Session Active</h4>
+
+            <p class="mt-3">Time remaining:</p>
+            <div class="timer text-warning" id="timer"></div>
+
+            <h5 class="mt-4">Attendance Link</h5>
+
+            <div class="link-box">
+                <span id="linkText">{{ scan_link }}</span>
+            </div>
+
+            <button class="btn btn-primary mt-3" onclick="copyLink()">
+                Copy Link
+            </button>
+
+            <form method="POST" class="mt-3">
+                <input type="hidden" name="action" value="stop">
+                <button class="btn btn-danger">
+                    Stop Session
+                </button>
+            </form>
+
         {% endif %}
 
     </div>
 
 </div>
 
-{% if session_active %}
 <script>
-    // Countdown timer
-    let timerElement = document.getElementById("timer");
-    let time = "{{ time_left }}";
+function copyLink(){
+    let text = document.getElementById("linkText").innerText;
+    navigator.clipboard.writeText(text);
+    alert("Link copied!");
+}
 
-    function toSeconds(t){
-        let parts = t.split(":");
-        return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseInt(parts[2]);
+// LIVE TIMER
+let seconds = parseInt("{{ time_left if time_left else 0 }}");
+let timerBox = document.getElementById("timer");
+
+function updateTimer(){
+    if(seconds <= 0){
+        location.reload();
+        return;
     }
+    let m = Math.floor(seconds/60);
+    let s = seconds%60;
+    timerBox.innerText = m + " : " + (s<10?"0"+s:s);
+    seconds--;
+}
 
-    function formatTime(s){
-        let h = Math.floor(s/3600);
-        let m = Math.floor((s%3600)/60);
-        let sec = s%60;
-        return String(h).padStart(2,'0') + ":" +
-               String(m).padStart(2,'0') + ":" +
-               String(sec).padStart(2,'0');
-    }
-
-    let total = toSeconds(time);
-
-    setInterval(function(){
-        if(total > 0){
-            total--;
-            timerElement.innerText = formatTime(total);
-        }else{
-            location.reload();
-        }
-    },1000);
+if(timerBox){
+    updateTimer();
+    setInterval(updateTimer,1000);
+}
 </script>
-{% endif %}
 
 </body>
 </html>

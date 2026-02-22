@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 from datetime import datetime, timedelta
 import uuid
 import os
+import qrcode
 import base64
 from face_matcher import find_student
 from database import *
@@ -20,6 +21,12 @@ session_data = {
     "end_time": None,
     "session_id": None
 }
+def generate_qr(roll):
+    path=f"static/qr/{roll}.png"
+    os.makedirs("static/qr", exist_ok=True)
+
+    img=qrcode.make(roll)
+    img.save(path)
 
 # ---------- HOME ----------
 @app.route("/")
@@ -87,23 +94,29 @@ def teacher_dashboard():
 
     subject = session["teacher"]
 
-    if request.method == "POST" and not session_data["active"]:
-        session_data["active"] = True
-        session_data["subject"] = subject
-        session_data["end_time"] = datetime.now() + timedelta(minutes=5)
-        session_data["session_id"] = str(uuid.uuid4())[:8]
+    # START SESSION
+    if request.method == "POST":
+        action = request.form.get("action")
+
+        if action == "start" and not session_data["active"]:
+            session_data["active"] = True
+            session_data["subject"] = subject
+            session_data["end_time"] = datetime.now() + timedelta(minutes=5)
+            session_data["session_id"] = str(uuid.uuid4())[:8]
+
+        if action == "stop":
+            session_data["active"] = False
 
     time_left = None
     scan_link = None
 
     if session_data["active"]:
-        if datetime.now() > session_data["end_time"]:
+        remaining = session_data["end_time"] - datetime.now()
+
+        if remaining.total_seconds() <= 0:
             session_data["active"] = False
         else:
-            remaining = session_data["end_time"] - datetime.now()
-            time_left = str(remaining).split(".")[0]
-
-            # 🔥 IMPORTANT CHANGE FOR PUBLIC LINK
+            time_left = int(remaining.total_seconds())
             base_url = request.host_url.rstrip("/")
             scan_link = f"{base_url}/scan?session={session_data['session_id']}"
 
@@ -144,11 +157,12 @@ def register():
             with open(filename, "wb") as f:
                 f.write(img_bytes)
 
+        # ✅ QR generate after face save
+        generate_qr(roll)
+
         return "Student Registered Successfully!"
 
     return render_template("register.html")
-
-
 # ---------- STUDENTS ----------
 @app.route("/students")
 def students():
@@ -218,17 +232,35 @@ def subject_view(subject):
 
 
 # ---------- QR ----------
-@app.route("/qr", methods=["GET", "POST"])
+@app.route("/qr", methods=["GET","POST"])
 def qr():
-    msg = None
     if request.method == "POST":
-        name = request.form["name"]
-        roll = request.form["roll"]
+
+        roll = request.form.get("roll")
+
+        student = get_student(roll)
+
+        if not student:
+            return "Student not found"
+
+        name = student[1]
+
         msg = mark_entry_exit(name, roll)
 
-    return render_template("qr_scan.html", msg=msg)
+        return msg
 
+    return render_template("qr_scan.html")
 
+@app.route("/gate_logs")
+def gate_logs():
+    if not session.get("admin"):
+        return redirect("/admin")
+
+    logs = get_gate_logs()
+    return render_template("gate_logs.html", logs=logs)
+@app.route("/gate")
+def gate():
+    return render_template("qr_scan.html")
 # ---------- SCAN ----------
 @app.route("/scan")
 def scan():
@@ -242,6 +274,9 @@ def scan():
 
     return render_template("scan.html")
 
+@app.route("/student_portal")
+def student_portal():
+    return render_template("student_portal.html")
 
 @app.route("/process_scan", methods=["POST"])
 def process_scan():
@@ -278,4 +313,4 @@ def process_scan():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)

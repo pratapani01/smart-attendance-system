@@ -1,29 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gate QR Scan</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-dark text-white" style="min-height:100vh;">
-    {% include "navbar.html" %}
+<title>Gate QR Scan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+    background:linear-gradient(135deg,#141E30,#243B55);
+    color:white;
+}
+.card-box{
+    background:rgba(255,255,255,.08);
+    padding:25px;
+    border-radius:12px;
+    backdrop-filter:blur(8px);
+    text-align:center;
+}
+#reader{
+    margin:auto;
+    width:300px;
+}
+#result{
+    margin-top:20px;
+    font-size:18px;
+    font-weight:bold;
+}
+@media(max-width:768px){
+
+    .container{
+        padding:15px!important;
+    }
+
+    h1,h2,h3{
+        font-size:22px!important;
+    }
+
+    .card-box{
+        padding:18px!important;
+    }
+
+    video{
+        width:100%!important;
+        height:auto!important;
+    }
+
+    table{
+        font-size:14px;
+    }
+
+    .btn{
+        width:100%;
+        margin-top:8px;
+    }
+
+}
+</style>
+</head>
+
+<body>
 
 <div class="container mt-5">
 
-    <h2>Gate QR Scan</h2>
-    <p>Enter student roll number to simulate QR scan</p>
+<h2>Gate Entry / Exit Scanner</h2>
 
-    <form method="POST">
-        <input type="text" name="name" placeholder="Student Name" class="form-control mb-2" required>
-        <input type="text" name="roll" placeholder="Roll Number" class="form-control mb-3" required>
-        <button type="submit" class="btn btn-warning">Scan QR</button>
-    </form>
+<div class="card-box mt-4">
 
-    {% if msg %}
-        <h4 class="mt-4">{{ msg }}</h4>
-    {% endif %}
+<div id="reader"></div>
+
+<div id="result"></div>
 
 </div>
+
+</div>
+
+<script>
+
+let lastScanTime = 0;
+let cooldown = 5000; // 5 seconds
+
+function onScanSuccess(decodedText){
+
+    let now = Date.now();
+
+    // ignore repeated scan within cooldown
+    if(now - lastScanTime < cooldown){
+        return;
+    }
+
+    lastScanTime = now;
+
+    document.getElementById("result").innerHTML="Processing...";
+
+    fetch("/qr",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:`roll=${decodedText}`
+    })
+    .then(res=>res.text())
+    .then(data=>{
+        document.getElementById("result").innerHTML=data;
+    });
+}
+
+let qr=new Html5QrcodeScanner(
+    "reader",
+    {fps:10, qrbox:250}
+);
+
+qr.render(onScanSuccess);
+
+</script>
 
 </body>
 </html>

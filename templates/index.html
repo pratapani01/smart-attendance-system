@@ -2,32 +2,103 @@
 <html>
 <head>
     <title>Smart Attendance System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+            background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+            color:white;
+            min-height:100vh;
+        }
+        .hero{
+            margin-top:120px;
+            text-align:center;
+        }
+        .hero h1{
+            font-size:48px;
+            font-weight:700;
+        }
+        .hero p{
+            font-size:18px;
+            opacity:.9;
+        }
+        .portal-card{
+            background:rgba(255,255,255,.08);
+            border-radius:12px;
+            padding:30px;
+            backdrop-filter: blur(8px);
+            transition:.3s;
+        }
+        .portal-card:hover{
+            transform:translateY(-5px);
+            background:rgba(255,255,255,.12);
+        }
+        @media(max-width:768px){
+
+    .container{
+        padding:15px!important;
+    }
+
+    h1,h2,h3{
+        font-size:22px!important;
+    }
+
+    .card-box{
+        padding:18px!important;
+    }
+
+    video{
+        width:100%!important;
+        height:auto!important;
+    }
+
+    table{
+        font-size:14px;
+    }
+
+    .btn{
+        width:100%;
+        margin-top:8px;
+    }
+
+}
+    </style>
 </head>
-<body class="bg-dark text-white" style="min-height:100vh;">
-    {% include "navbar.html" %}
 
+<body>
 
-<div class="container text-center mt-5">
+<div class="container hero">
 
-    <h1 class="mb-4">Smart Campus Attendance System</h1>
+    <h1>Smart Attendance System</h1>
+    <p class="mt-3">
+        AI-powered face recognition attendance with secure session-based tracking,
+        campus entry logs, and analytics dashboard.
+    </p>
 
-    <div class="row justify-content-center">
+    <div class="row mt-5">
 
-        <div class="col-md-3 mb-3">
-            <a href="/teacher" class="btn btn-primary btn-lg w-100">Teacher Login</a>
+        <div class="col-md-4 mb-4">
+            <div class="portal-card">
+                <h3>Teacher Portal</h3>
+                <p>Start attendance session and share secure link with students.</p>
+                <a href="/teacher" class="btn btn-primary w-100">Teacher Login</a>
+            </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <a href="/admin" class="btn btn-success btn-lg w-100">Admin Login</a>
+        <div class="col-md-4 mb-4">
+            <div class="portal-card">
+                <h3>Admin Panel</h3>
+                <p>Manage students, reports, analytics, and system controls.</p>
+                <a href="/admin" class="btn btn-success w-100">Admin Login</a>
+            </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <a href="/scan" class="btn btn-warning btn-lg w-100">Student Face Scan</a>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <a href="/qr" class="btn btn-danger btn-lg w-100">Gate QR Scan</a>
+        <div class="col-md-4 mb-4">
+            <div class="portal-card">
+                <h3>Student Portal</h3>
+                <p>View timetable, notices, and attendance information.</p>
+                <a href="/student_portal" class="btn btn-warning w-100">Open Portal</a>
+            </div>
         </div>
 
     </div>
